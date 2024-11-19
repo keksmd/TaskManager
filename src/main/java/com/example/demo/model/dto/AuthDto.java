@@ -1,4 +1,4 @@
 package com.example.demo.model.dto;
 
-public class AuthDto {
+public record AuthDto(String password,String username) {
 }

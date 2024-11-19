@@ -1,11 +1,13 @@
-package com.example.demo.security;
+package com.example.demo.config.security;
 
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,20 +35,29 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    private static Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJwt(token).getBody();
+
+    public static Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token) // Измените на parseClaimsJws
+                .getBody();
     }
 
-    private static Boolean isTokenExpired(String token) {
+    public static Collection<? extends GrantedAuthority> extractAuthority(String token) {
+        return extractClaim(token, (Claims claims)->claims.get("roles",Collection.class));
+    }
+
+    public static Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
     public static String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", userDetails.getAuthorities());
         return createToken(claims, userDetails.getUsername());
     }
 
-    private static String createToken(Map<String, Object> claims, String subject) {
+    public static String createToken(Map<String, Object> claims, String subject) {
 
         return Jwts.builder().addClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)).

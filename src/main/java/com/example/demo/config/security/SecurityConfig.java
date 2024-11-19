@@ -1,10 +1,11 @@
-package com.example.demo.security;
+package com.example.demo.config.security;
 
 import com.example.demo.model.data.Role;
 import com.example.demo.model.data.UserEntity;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.CustomUserDetailsService;
+import com.example.demo.service.TaskServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -36,10 +38,10 @@ public class SecurityConfig {
 
 
     @Bean
-    CustomUserDetailsService customUserDetailsService(@Autowired UserRepository userRepository,
+    CustomUserDetailsService customUserDetailsService(@Autowired TaskServiceImpl taskService, @Autowired UserRepository userRepository,
                                                       @Qualifier("adminRole") Role adminRole,
                                                       @Qualifier("userRole") Role userRole) {
-        var userDetailsManager = new CustomUserDetailsService(userRepository);
+        var userDetailsManager = new CustomUserDetailsService(userRepository,taskService);
 
         var user = new UserEntity();
         user.setId(1L);
@@ -99,12 +101,10 @@ public class SecurityConfig {
                                     );
                                 }
                         ))
-                /*.addFilterBefore(
+                .addFilterBefore(
                         jwtTokenFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
-
-                 */
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/taskmaster/users/auth").permitAll()
                         .anyRequest().authenticated()

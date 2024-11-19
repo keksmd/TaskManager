@@ -1,4 +1,4 @@
-package com.example.demo.security;
+package com.example.demo.config.security;
 
 import com.example.demo.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
@@ -27,15 +27,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwtToken;
         String username;
         String bearerToken = request.getHeader("Authorization");
+        System.out.println("bearter: "+bearerToken);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             jwtToken = bearerToken.substring(7);
+            System.out.println("jwt:"+jwtToken);
             username = JwtUtil.extractUsername(jwtToken);
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            System.out.println("username: "+username);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null&&userDetailsService.userExists(username)) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 if (JwtUtil.validateToken(jwtToken, userDetails)) {
-                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                    try {
+                        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        throw  e;
+                    }
                 }
             }
         }

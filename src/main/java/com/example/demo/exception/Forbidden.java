@@ -1,4 +1,4 @@
 package com.example.demo.exception;
 
-public class Forbidden {
+public class Forbidden extends Throwable {
 }

@@ -1,4 +1,7 @@
 package com.example.demo.model;
 
-public class Priority {
+public enum Priority {
+    LOW,
+    MEDIUM,
+    HIGH;
 }

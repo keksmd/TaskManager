@@ -16,7 +16,8 @@ public class JwtUtilTest {
 
     private static final String SECRET_KEY = "secret";
     private static final String USERNAME = "testUser";
-    private static final String TOKEN = JwtUtil.
+    static Map<String,Object> a = new HashMap<>();
+    private static final String TOKEN = JwtUtil.createToken(a,USERNAME);
 
     @Test
     public void testExtractUsername() {

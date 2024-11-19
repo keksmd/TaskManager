@@ -1,8 +1,9 @@
 package com.example.demo.repository;
 
-import com.example.demo.model.data.Task;
+import com.example.demo.model.data.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface TaskRepository  extends JpaRepository<Task,Long>{
+import org.springframework.stereotype.Repository;
+@Repository
+public interface CommentRepository extends JpaRepository<Comment,Long>{
 
 }

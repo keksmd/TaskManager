@@ -1,9 +1,10 @@
-package com.example.demo.dto;
+package com.example.demo.model.dto;
 
-import com.example.demo.model.data.Status;
+import com.example.demo.model.Priority;
+import com.example.demo.model.Status;
 
 import java.util.Set;
 
 
-public record TaskRequest(String header, Status status, Long id, Long authorId, Set<Long> commentsId, Long assigneeId) {
+public record TaskRequest(Priority priority, String header, Status status, CommentDtoRequest commentDtoRequest, Long assigneeId) {
 }

@@ -1,15 +1,18 @@
-package com.example.demo.data;
+package com.example.demo.model.data;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 @Data
 @Entity
 public class UserEntity implements UserDetails {
+    private String email;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,4 +31,15 @@ public class UserEntity implements UserDetails {
     @OneToMany
     private  Set<Task> tasks;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserEntity entity)) return false;
+        return Objects.equals(email, entity.email) && Objects.equals(id, entity.id) && Objects.equals(username, entity.username) && Objects.equals(password, entity.password) && Objects.equals(passwordConfirm, entity.passwordConfirm) && Objects.equals(roles, entity.roles) && Objects.equals(tasks, entity.tasks);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(email, id, username, password, passwordConfirm);
+    }
 }
