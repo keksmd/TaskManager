@@ -1,6 +1,5 @@
 # Указываем образ с Java 23
-FROM openjdk:23-jdk-slim
-
+FROM openjdk:17-jdk-slim
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
