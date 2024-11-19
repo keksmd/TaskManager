@@ -21,7 +21,8 @@ public class CommentMapperImpl implements CommentMapper{
         return new CommentDtoResponse(comment.getParent()==null?null:toResponse(comment.getParent()),
                 comment.getChildren()==null?null:new HashSet<>(comment.getChildren().stream().map(this::toResponse).collect(Collectors.toSet())),
                 comment.getId(),
-                comment.getBody(),userMapper.toDto(comment.getAuthor() ));
+                comment.getBody(),
+                userMapper.toDto(comment.getAuthor())) ;
     }
 
     @Override

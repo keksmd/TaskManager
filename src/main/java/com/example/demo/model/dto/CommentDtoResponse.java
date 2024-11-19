@@ -5,5 +5,5 @@ import java.util.Set;
 public record CommentDtoResponse(CommentDtoResponse parent,
                                  Set<CommentDtoResponse> children,
                                  Long id,
-                                 String body,UserDto author) {
+                                 String body,UserDtoResponse author) {
 }

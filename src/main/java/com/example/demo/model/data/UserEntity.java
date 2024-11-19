@@ -29,7 +29,7 @@ public class UserEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles;
     }
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private  Set<Task> tasks = new HashSet<>();
 
     @Override

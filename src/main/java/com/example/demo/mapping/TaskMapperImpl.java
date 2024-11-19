@@ -23,8 +23,4 @@ public class TaskMapperImpl implements TaskMapper {
                 userMapper.toDto(taskEntity.getAssignee()));
     }
 
-    @Override
-    public Task toEntity(TaskResponse taskResponse) {
-        return null;
-    }
 }

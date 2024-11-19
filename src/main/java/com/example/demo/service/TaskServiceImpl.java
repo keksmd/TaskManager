@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.exception.Forbidden;
 import com.example.demo.mapping.TaskMapper;
 import com.example.demo.model.data.Task;
 import com.example.demo.model.data.UserEntity;
@@ -10,7 +9,6 @@ import com.example.demo.repository.TaskRepository;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -60,7 +58,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponse deleteTask(UserDetails userDetails, Long id) throws ChangeSetPersister.NotFoundException, Forbidden {
+    public TaskResponse deleteTask(UserDetails userDetails, Long id)  {
         Task task = taskRepository.getReferenceById(id);
         taskRepository.delete(task);
         return taskMapper.toResponse(task);

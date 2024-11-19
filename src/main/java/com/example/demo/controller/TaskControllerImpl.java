@@ -39,7 +39,7 @@ public class TaskControllerImpl implements TaskController {
 
     @Override
     @PreAuthorize("customUserDetailsService.isAdminOrAssigneeOfTaskAnd(details,id)")
-    public @ResponseBody TaskResponse deleteTask(UserDetails details, Long id) throws ChangeSetPersister.NotFoundException, Forbidden {
+    public @ResponseBody TaskResponse deleteTask(UserDetails details, Long id) {
         return taskService.deleteTask(details, id);
     }
 
