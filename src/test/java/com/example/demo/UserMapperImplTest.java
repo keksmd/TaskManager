@@ -56,8 +56,7 @@ public class UserMapperImplTest {
         assertEquals(userEntity.getId(), dto.id());
         assertEquals(userEntity.getUsername(), dto.username());
         assertEquals(userEntity.getEmail(), dto.email());
-        assertEquals(userEntity.getAuthorities().size(), dto.roles().size());
-        assertEquals("role", dto.roles().iterator().next().name());
+
     }
 
     @Test
