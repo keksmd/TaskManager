@@ -3,9 +3,9 @@ package com.example.demo.config.security;
 import com.example.demo.model.data.Role;
 import com.example.demo.model.data.UserEntity;
 import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.TaskRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.CustomUserDetailsService;
-import com.example.demo.service.TaskServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +38,10 @@ public class SecurityConfig {
 
 
     @Bean
-    CustomUserDetailsService customUserDetailsService(@Autowired TaskServiceImpl taskService, @Autowired UserRepository userRepository,
+    CustomUserDetailsService customUserDetailsService(@Autowired TaskRepository taskRepo, @Autowired UserRepository userRepository,
                                                       @Qualifier("adminRole") Role adminRole,
                                                       @Qualifier("userRole") Role userRole) {
-        var userDetailsManager = new CustomUserDetailsService(userRepository,taskService);
+        var userDetailsManager = new CustomUserDetailsService(userRepository,taskRepo);
 
         var user = new UserEntity();
         user.setId(1L);

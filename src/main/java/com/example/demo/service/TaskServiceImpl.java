@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.annotation.Roles;
 import com.example.demo.exception.Forbidden;
 import com.example.demo.mapping.TaskMapper;
 import com.example.demo.model.data.Task;
@@ -32,7 +31,6 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @Roles(allow = {"ADMIN"})
     public TaskResponse createTask(UserDetails userDetails, TaskRequest task) {
         Task taskEntity = new Task();
         UserEntity author = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
@@ -53,7 +51,11 @@ public class TaskServiceImpl implements TaskService {
 
     private void fillEntity(TaskRequest task, Task taskEntity, UserEntity author) {
         BeanUtils.copyProperties(task, taskEntity);
-        taskEntity.setAssignee(userRepository.getReferenceById(task.assigneeId()));
+        taskEntity.setHeader(task.header());
+        taskEntity.setPriority(task.priority());
+        taskEntity.setStatus(task.status());
+        if(task.assigneeId() != null){
+        taskEntity.setAssignee(userRepository.getReferenceById(task.assigneeId()));}
         taskEntity.setAuthor(author);
     }
 

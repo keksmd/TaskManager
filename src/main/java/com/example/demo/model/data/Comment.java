@@ -1,12 +1,10 @@
 package com.example.demo.model.data;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -16,9 +14,10 @@ public class Comment {
     @ManyToOne
     private Comment parent = null;
     @OneToMany
-    private Set<Comment> children;
+    private Set<Comment> children = new HashSet<>();
     @Getter
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private  String body;
     @ManyToOne

@@ -5,6 +5,7 @@ import com.example.demo.model.data.Role;
 import com.example.demo.model.data.UserEntity;
 import com.example.demo.model.dto.RoleDto;
 import com.example.demo.model.dto.UserDto;
+import com.example.demo.model.dto.UserDtoResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -48,7 +49,7 @@ public class UserMapperImplTest {
     @Test
     public void testToDto() {
         // Вызов метода
-        UserDto dto = userMapper.toDto(userEntity);
+        UserDtoResponse dto = userMapper.toDto(userEntity);
 
         // Проверка результатов
         assertNotNull(dto);

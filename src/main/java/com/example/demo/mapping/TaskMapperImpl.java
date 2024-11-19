@@ -14,7 +14,13 @@ public class TaskMapperImpl implements TaskMapper {
     private final CommentMapper commentMapper;
     @Override
     public TaskResponse toResponse(Task taskEntity) {
-        return new TaskResponse(taskEntity.getPriority(), taskEntity.getHeader(), taskEntity.getStatus(), taskEntity.getId(), userMapper.toDto(taskEntity.getAuthor()), taskEntity.getComments().stream().map(commentMapper::toResponse).collect(Collectors.toSet()), userMapper.toDto(taskEntity.getAssignee()));
+        return new TaskResponse(taskEntity.getPriority(),
+                taskEntity.getHeader(),
+                taskEntity.getStatus(),
+                taskEntity.getId(),
+                userMapper.toDto(taskEntity.getAuthor()),
+                taskEntity.getComments().stream().map(commentMapper::toResponse).collect(Collectors.toSet()),
+                userMapper.toDto(taskEntity.getAssignee()));
     }
 
     @Override

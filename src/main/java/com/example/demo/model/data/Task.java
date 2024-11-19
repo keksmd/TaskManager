@@ -5,6 +5,7 @@ import com.example.demo.model.Status;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -17,12 +18,13 @@ public class Task {
     @Enumerated
     private Priority priority;
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
     @JoinColumn(name = "author_id")
     private UserEntity author;
     @OneToMany
-    private Set<Comment> comments;
+    private Set<Comment> comments = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

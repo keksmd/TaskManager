@@ -3,9 +3,11 @@ package com.example.demo.mapping;
 import com.example.demo.model.data.UserEntity;
 import com.example.demo.model.dto.RoleDto;
 import com.example.demo.model.dto.UserDto;
+import com.example.demo.model.dto.UserDtoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Component
@@ -13,11 +15,12 @@ import java.util.stream.Collectors;
 public class UserMapperImpl implements UserMapper{
 
     @Override
-    public UserDto toDto(UserEntity user) {
-        return new UserDto(user.getId(),
+    public UserDtoResponse toDto(UserEntity user) {
+        if(user==null){
+            return new UserDtoResponse(null,"",new HashSet<>(),"");
+        }
+        return new UserDtoResponse(user.getId(),
                 user.getUsername(),
-                user.getPassword(),
-                user.getEmail(),
                 user.getAuthorities()
                         .stream()
                         .map(e -> new RoleDto(e.getAuthority()))

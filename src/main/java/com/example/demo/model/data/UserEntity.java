@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 @Data
@@ -22,14 +23,14 @@ public class UserEntity implements UserDetails {
     @Transient
     private String passwordConfirm;
     @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles;
     }
     @OneToMany
-    private  Set<Task> tasks;
+    private  Set<Task> tasks = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
