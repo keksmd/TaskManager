@@ -1,22 +1,16 @@
-# Указываем образ с Java 23
-FROM openjdk:23-oracle
-# Устанавливаем рабочую директорию
+# Use the official Maven image with OpenJDK 21
+FROM maven:3.9.9-eclipse-temurin-21-jammy
+
+# Set the working directory
 WORKDIR /app
 
-# Копируем pom.xml и файл зависимостей для сборки
+# Copy the pom.xml and source code
 COPY pom.xml .
-
-# Копируем код приложения
 COPY src ./src
-RUN apt-get update && apt-get install -y maven
-# Собираем Jar файл
-RUN mvn clean package -DskipTests
 
-# Копируем скомпилированный Jar файл в образ
-COPY target/*.jar app.jar
+# Package the application
+RUN mvn clean package -DskipTests &&  echo "$(ls -la /app/target)"
+# Copy the packaged JAR file from the builder stage
+# Command to run the application
+ENTRYPOINT ["java", "-jar", "com.example.demo1.0.0.1-SNAPSHOT.jar"]
 
-# Указываем, что контейнер слушает порт 8080
-EXPOSE 8080
-
-# Указываем команду для запуска приложения
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
