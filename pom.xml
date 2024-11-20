@@ -148,12 +148,19 @@
 			</dependencies>
 
 	</dependencyManagement>
+	<annotationProcessorPaths>
+		<path>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.24</version>
+		</path>
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<!--
 				<configuration>
 					<excludes>
 						<exclude>
@@ -162,6 +169,7 @@
 						</exclude>
 					</excludes>
 				</configuration>
+				-->
 			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -169,6 +177,13 @@
                 <configuration>
                     <source>17</source>
                     <target>17</target>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.24</version>
+						</path>
+					</annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>
