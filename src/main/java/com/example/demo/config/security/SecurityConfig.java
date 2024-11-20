@@ -6,7 +6,6 @@ import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.TaskRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.CustomUserDetailsService;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,8 +24,6 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.HashSet;
 import java.util.List;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @RequiredArgsConstructor
@@ -70,6 +67,7 @@ public class SecurityConfig {
         return role;
     }
 
+
     @Bean
     Role userRole(@Autowired RoleRepository roleRepository) {
         Role role = new Role();
@@ -85,31 +83,61 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,@Autowired JwtRequestFilter jwtTokenFilter,@Autowired CorsFilter corsFilter) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http,@Autowired JwtRequestFilter jwtTokenFilter) throws Exception {
         http.cors(c->{
                 })
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement((s) -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling((exHandler) -> exHandler.
+                /*.exceptionHandling((exHandler) -> exHandler.
                         authenticationEntryPoint(
                                 (request, response, ex) -> {
                                     ex.printStackTrace();
-                                    response.sendError(
-                                            HttpServletResponse.SC_UNAUTHORIZED,
-                                            ex.getMessage()
-                                    );
+                                    if (ex instanceof org.springframework.security.authentication.BadCredentialsException||
+                                     ex instanceof UsernameNotFoundException) {
+                                        response.sendError(
+                                                HttpServletResponse.SC_UNAUTHORIZED,
+                                                ex.getMessage()
+                                        );
+                                    }
+
                                 }
                         ))
+
+                  */
+                .authorizeHttpRequests((authz) -> authz
+                        .requestMatchers("/taskmaster/users/auth",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v2/api-docs",
+                                "/swagger-resources/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/swagger-ui.html",
+                                "/v2/api-docs/**",
+                                "/webjars/**",
+                                "/v2/api-docs",
+                                "/configuration/ui",
+                                "/swagger-resources/**",
+                                "/configuration/**",
+                                "/swagger-ui.html",
+                                "/webjars/**",
+                                "/csrf",
+                                "/",
+                                "/v2/api-docs",
+                                "/configuration/ui",
+                                "/swagger-resources/**",
+                                "/configuration/security",
+                                "/swagger-ui.html",
+                                "/webjars/**").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .addFilterBefore(
                         jwtTokenFilter,
                         UsernamePasswordAuthenticationFilter.class
-                )
-                .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/taskmaster/users/auth").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(withDefaults());
+                );
         return http.build();
     }
     @Bean

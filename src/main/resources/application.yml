@@ -1,4 +1,7 @@
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
   security:
     user:
       password: user
@@ -16,4 +19,7 @@ spring:
             non_contextual_creation: true
 
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
+springfox:
+  documentation:
+    swagger-ui:
+      base-url: ""

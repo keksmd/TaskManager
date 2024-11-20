@@ -19,8 +19,7 @@ public class JwtUtil {
         throw new UnsupportedOperationException("");
     }
 
-    ;
-    private static String SECRET_KEY = "secret";
+    private static final String SECRET_KEY = "secret";
 
     public static String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Base64;
 
 
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -27,7 +28,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwtToken;
         String username;
         String bearerToken = request.getHeader("Authorization");
-        System.out.println("bearter: "+bearerToken);
+        System.out.println("beater: "+bearerToken);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             jwtToken = bearerToken.substring(7);
             System.out.println("jwt:"+jwtToken);
@@ -43,6 +44,25 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     }catch (Exception e){
                         e.printStackTrace();
                         throw  e;
+                    }
+                }
+            }
+        }else if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Basic ")) {
+            String base64Credentials = bearerToken.substring("Basic ".length()).trim();
+            username = new String(Base64.getDecoder().decode(base64Credentials));
+            String password = username.split(":")[1];
+            username = username.split(":")[0];
+
+            if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null&&userDetailsService.userExists(username)) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if(userDetails.getPassword().equals(password)) {
+                    try {
+                        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw e;
                     }
                 }
             }

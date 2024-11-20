@@ -6,10 +6,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.security.sasl.AuthenticationException;
+
 @RequestMapping("/taskmaster/users")
 public interface UserController {
     @PostMapping("/auth")
 
 
-    @ResponseBody String auth(@RequestBody AuthDto auth);
+    @ResponseBody String auth(@RequestBody AuthDto auth) throws AuthenticationException;
 }

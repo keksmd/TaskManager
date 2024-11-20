@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @SpringBootApplication
 @EnableAspectJAutoProxy
 @EnableWebSecurity
+//@EnableSwagger2
+//@EnableOpenApi
 public class Demo1Application {
 
     public static void main(String[] args) {
