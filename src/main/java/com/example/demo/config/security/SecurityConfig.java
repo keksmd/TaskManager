@@ -6,14 +6,19 @@ import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.TaskRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -27,7 +32,8 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
-public class SecurityConfig {
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class SecurityConfig  {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -89,7 +95,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement((s) -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                /*.exceptionHandling((exHandler) -> exHandler.
+                .exceptionHandling((exHandler) -> exHandler.
                         authenticationEntryPoint(
                                 (request, response, ex) -> {
                                     ex.printStackTrace();
@@ -104,7 +110,7 @@ public class SecurityConfig {
                                 }
                         ))
 
-                  */
+
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/taskmaster/users/auth",
                                 "/swagger-ui/**",
@@ -151,6 +157,14 @@ public class SecurityConfig {
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
+    }
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http, @Autowired CustomUserDetailsService customUserDetailsService) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+        System.out.println("auth manager is ready:"+authenticationManagerBuilder.isConfigured());
+        authenticationManagerBuilder.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
+        return authenticationManagerBuilder.build();
     }
 
 }
