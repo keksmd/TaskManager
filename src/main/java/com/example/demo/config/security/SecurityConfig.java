@@ -1,5 +1,6 @@
 package com.example.demo.config.security;
 
+import com.example.demo.config.security.jwt.JwtRequestFilter;
 import com.example.demo.model.data.Role;
 import com.example.demo.model.data.UserEntity;
 import com.example.demo.repository.RoleRepository;
@@ -14,7 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -32,7 +32,6 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig  {
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -106,39 +105,23 @@ public class SecurityConfig  {
                                                 ex.getMessage()
                                         );
                                     }
-
                                 }
                         ))
-
-
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/taskmaster/users/auth",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v2/api-docs",
                                 "/swagger-resources/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/swagger-ui.html",
-                                "/v2/api-docs/**",
                                 "/webjars/**",
-                                "/v2/api-docs",
                                 "/configuration/ui",
-                                "/swagger-resources/**",
                                 "/configuration/**",
-                                "/swagger-ui.html",
-                                "/webjars/**",
                                 "/csrf",
                                 "/",
-                                "/v2/api-docs",
-                                "/configuration/ui",
-                                "/swagger-resources/**",
-                                "/configuration/security",
-                                "/swagger-ui.html",
-                                "/webjars/**").permitAll()
-                        .anyRequest().authenticated()
+                                "/configuration/security"
+                            ).permitAll()
+                      .anyRequest().authenticated()
                 )
                 .addFilterBefore(
                         jwtTokenFilter,
@@ -160,9 +143,7 @@ public class SecurityConfig  {
     }
     @Bean
     public AuthenticationManager authManager(HttpSecurity http, @Autowired CustomUserDetailsService customUserDetailsService) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
-        System.out.println("auth manager is ready:"+authenticationManagerBuilder.isConfigured());
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
         return authenticationManagerBuilder.build();
     }

@@ -14,11 +14,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
-    private final CustomUserDetailsService customUserDetailsService;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TaskMapper taskMapper;
@@ -40,8 +40,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponse updateTask(UserDetails userDetails, TaskRequest task, Long id) {
         Task taskEntity = taskRepository.getReferenceById(id);
-        UserEntity author = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
-        fillEntity(task, taskEntity, author);
+        fillEntity(task, taskEntity, taskEntity.getAuthor());
         taskRepository.save(taskEntity);
         return taskMapper.toResponse(taskEntity);
 
@@ -58,10 +57,14 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponse deleteTask(UserDetails userDetails, Long id)  {
-        Task task = taskRepository.getReferenceById(id);
-        taskRepository.delete(task);
-        return taskMapper.toResponse(task);
+    public Optional<TaskResponse> deleteTask(UserDetails userDetails, Long id) {
+        Optional<Task> task = taskRepository.findById(id);
+        if (task.isPresent()) {
+            taskRepository.delete(task.get());
+            return Optional.of(taskMapper.toResponse(task.get()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override

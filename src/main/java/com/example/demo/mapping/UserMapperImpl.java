@@ -13,13 +13,13 @@ public class UserMapperImpl implements UserMapper{
     @Override
     public UserDtoResponse toDto(UserEntity user) {
         if(user==null){
-            return new UserDtoResponse(null,"","");
+            return new UserDtoResponse(null,"User not found","");
+        }else {
+            return new UserDtoResponse(user.getId(),
+                    user.getUsername(),
+                    user.getEmail());
         }
-        return new UserDtoResponse(user.getId(),
-                user.getUsername(),
-              user.getEmail());
     }
-
     @Override
     public UserEntity toEntity(UserDto user) {
         UserEntity  userEntity= new UserEntity();

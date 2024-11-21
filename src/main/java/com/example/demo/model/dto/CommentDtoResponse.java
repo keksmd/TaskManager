@@ -1,9 +1,9 @@
-package com.example.demo.model.dto;
+    package com.example.demo.model.dto;
 
-import java.util.Set;
+    import java.util.Set;
 
-public record CommentDtoResponse(CommentDtoResponse parent,
-                                 Set<CommentDtoResponse> children,
-                                 Long id,
-                                 String body,UserDtoResponse author) {
-}
+    public record CommentDtoResponse(CommentDtoResponse parent,
+                                     Set<CommentDtoResponse> children,
+                                     Long id,
+                                     String body,UserDtoResponse author) {
+    }

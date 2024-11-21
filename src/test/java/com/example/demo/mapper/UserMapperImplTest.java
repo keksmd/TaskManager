@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.mapper;
 
 import com.example.demo.mapping.UserMapperImpl;
 import com.example.demo.model.data.Role;

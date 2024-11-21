@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.dto.TaskRequest;
 import com.example.demo.model.dto.TaskResponse;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +21,7 @@ public interface TaskController {
     @ResponseBody TaskResponse updateTask(@AuthenticationPrincipal UserDetails details, @RequestBody TaskRequest task, @PathVariable Long id);
 
     @DeleteMapping("/{id}")
-    @ResponseBody TaskResponse deleteTask(@AuthenticationPrincipal UserDetails details, @PathVariable Long id);
+    @ResponseBody TaskResponse deleteTask(@AuthenticationPrincipal UserDetails details, @PathVariable Long id) throws ChangeSetPersister.NotFoundException;
 
     @GetMapping("/{id}")
     @ResponseBody TaskResponse getTaskById(@AuthenticationPrincipal UserDetails details, @PathVariable Long id);

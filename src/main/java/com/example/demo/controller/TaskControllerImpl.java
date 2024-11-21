@@ -1,12 +1,10 @@
 
 package com.example.demo.controller;
 
-import com.example.demo.exception.Forbidden;
 import com.example.demo.model.dto.TaskRequest;
 import com.example.demo.model.dto.TaskResponse;
 import com.example.demo.service.TaskService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,15 +30,15 @@ public class TaskControllerImpl implements TaskController {
     }
 
     @Override
-    @PreAuthorize("customUserDetailsService.isAdminOrAssigneeOfTaskAnd(details,id)")
+    @PreAuthorize("customUserDetailsService.isAdminOrAssignee(details,id)")
     public @ResponseBody TaskResponse updateTask(UserDetails details, TaskRequest task, Long id) {
        return  taskService.updateTask(details,task,id);
     }
 
     @Override
-    @PreAuthorize("customUserDetailsService.isAdminOrAssigneeOfTaskAnd(details,id)")
+    @PreAuthorize("customUserDetailsService.isAdminOrAssignee(details,id)")
     public @ResponseBody TaskResponse deleteTask(UserDetails details, Long id) {
-        return taskService.deleteTask(details, id);
+        return taskService.deleteTask(details, id).orElseThrow();
     }
 
     @Override

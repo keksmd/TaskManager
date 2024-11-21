@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.dto.AuthDto;
-import com.example.demo.config.security.JwtUtil;
+import com.example.demo.config.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.userdetails.UserDetails;

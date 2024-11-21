@@ -5,6 +5,7 @@ import com.example.demo.model.dto.TaskResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Component
@@ -19,7 +20,7 @@ public class TaskMapperImpl implements TaskMapper {
                 taskEntity.getStatus(),
                 taskEntity.getId(),
                 userMapper.toDto(taskEntity.getAuthor()),
-                taskEntity.getComments().stream().map(commentMapper::toResponse).collect(Collectors.toSet()),
+                (taskEntity.getComments().isEmpty() ? new HashSet<>() : taskEntity.getComments().stream().map(commentMapper::toResponse).collect(Collectors.toSet())),
                 userMapper.toDto(taskEntity.getAssignee()));
     }
 

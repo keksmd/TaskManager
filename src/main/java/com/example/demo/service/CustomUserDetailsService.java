@@ -61,7 +61,7 @@ public class CustomUserDetailsService implements UserDetailsManager {
         }
     }
     private final TaskRepository taskRepository;
-    public boolean isAdminOrAssigneeOfTaskAnd(UserDetails userDetails,Long taskId){
+    public boolean isAdminOrAssignee(UserDetails userDetails, Long taskId){
         try {
             var user = this.findByDetails(userDetails);
             boolean assignee;

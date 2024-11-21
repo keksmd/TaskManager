@@ -1,4 +1,4 @@
-package com.example.demo.config.security;
+package com.example.demo.config.swagger;
 
 import org.springframework.context.annotation.Configuration;
 
