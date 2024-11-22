@@ -16,9 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashSet;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -57,7 +54,7 @@ public class CommentMapperImplTest {
         comment.setParent(parentComment);
         author.setId(1L);
         comment.setAuthor(author);
-        commentDtoRequest = new CommentDtoRequest(4L,new HashSet<>(List.of(2L, 1L)),"This is a comment");
+        commentDtoRequest = new CommentDtoRequest(4L,"This is a comment");
 
         
         // Создание тестового ответа
@@ -79,7 +76,7 @@ public class CommentMapperImplTest {
     @Test
 
     public void testToEntityWithNullReferences() {
-        commentDtoRequest = new CommentDtoRequest(null,new HashSet<>(List.of(2L, 1L)),"This is a comment");
+        commentDtoRequest = new CommentDtoRequest(null,"This is a comment");
 
 
         // Вызов метода

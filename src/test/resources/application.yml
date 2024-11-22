@@ -17,4 +17,14 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+
         dialect: org.hibernate.dialect.PostgreSQLDialect
+logging:
+  level:
+    root: INFO
+    com:
+      example:
+        demo:
+          service: INFO
+          config: INFO
+          controller: INFO

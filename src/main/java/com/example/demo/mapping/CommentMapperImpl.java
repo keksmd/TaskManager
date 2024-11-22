@@ -1,5 +1,6 @@
 package com.example.demo.mapping;
 
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.data.Comment;
 import com.example.demo.model.dto.CommentDtoRequest;
 import com.example.demo.model.dto.CommentDtoResponse;
@@ -29,8 +30,11 @@ public class CommentMapperImpl implements CommentMapper{
     public Comment toEntity(CommentDtoRequest commentDtoRequest, Long authorId) {
       Comment comment = new Comment();
       comment.setBody(commentDtoRequest.body());
-      comment.setChildren(new HashSet<>(commentRepository.findAllById(commentDtoRequest.childrenId())));
-      comment.setParent(commentRepository.findById(commentDtoRequest.parentId()).orElse(null));
+        if (commentDtoRequest.parentId() != null) {
+            commentRepository.findById(commentDtoRequest.parentId()).ifPresentOrElse(comment::setParent, () -> {
+                throw new ResourceNotFoundException(String.format("Comment with id %d not found", commentDtoRequest.parentId()));
+            });
+        }
       comment.setAuthor(userRepository.findById(authorId).orElse(null));
       return  comment;
     }
