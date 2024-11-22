@@ -3,17 +3,17 @@ package com.example.demo.controller;
 import com.example.demo.model.dto.TaskRequest;
 import com.example.demo.model.dto.TaskResponse;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@RequestMapping("taskmaster/tasks/")
+@RequestMapping("taskmaster/tasks")
 public interface TaskController {
     @GetMapping
-    List<TaskResponse> getAll(Pageable pageable,@AuthenticationPrincipal UserDetails details);
+    @ResponseBody
+    Page<TaskResponse> getAll(Pageable pageable, @AuthenticationPrincipal UserDetails details);
     @PostMapping
     @ResponseBody TaskResponse createTask(@AuthenticationPrincipal UserDetails details, @RequestBody TaskRequest task);
 

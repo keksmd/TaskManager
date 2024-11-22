@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j; // Импортируем аннотацию для логирования
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Base64;
 
-
+@Slf4j // Аннотация для логирования
 public class JwtRequestFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService userDetailsService;
 
@@ -28,46 +29,60 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwtToken;
         String username;
         String bearerToken = request.getHeader("Authorization");
-        System.out.println("beater: "+bearerToken);
+
+        log.info("Authorization header: {}", bearerToken);
+
+        // Проверка на Bearer Token
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             jwtToken = bearerToken.substring(7);
-            System.out.println("jwt:"+jwtToken);
+            log.info("Extracted JWT Token: {}", jwtToken);
             username = JwtUtil.extractUsername(jwtToken);
-            System.out.println("username: "+username);
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null&&userDetailsService.userExists(username)) {
+            log.info("Extracted username: {}", username);
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null && userDetailsService.userExists(username)) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 if (JwtUtil.validateToken(jwtToken, userDetails)) {
                     try {
                         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                         usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                        throw  e;
-                    }
-                }
-            }
-        }else if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Basic ")) {
-            String base64Credentials = bearerToken.substring("Basic ".length()).trim();
-            username = new String(Base64.getDecoder().decode(base64Credentials));
-            String password = username.split(":")[1];
-            username = username.split(":")[0];
-
-            if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null&&userDetailsService.userExists(username)) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if(userDetails.getPassword().equals(password)) {
-                    try {
-                        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                        log.info("User {} authenticated successfully with Bearer token", username);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("Authentication error for user {}: {}", username, e.getMessage());
                         throw e;
                     }
                 }
             }
         }
+        // Проверка на Basic Authentication
+        else if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Basic ")) {
+            String base64Credentials = bearerToken.substring("Basic ".length()).trim();
+            String credentials = new String(Base64.getDecoder().decode(base64Credentials));
+            username = credentials.split(":")[0];
+
+            String password = credentials.split(":")[1];
+
+            log.info("Extracted Basic credentials for user: {}", username);
+
+            if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null && userDetailsService.userExists(username)) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                if (userDetails.getPassword().equals(password)) {
+                    try {
+                        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                        log.info("User {} authenticated successfully with Basic token", username);
+                    } catch (Exception e) {
+                        log.error("Authentication error for user {}: {}", username, e.getMessage());
+                        throw e;
+                    }
+                } else {
+                    log.warn("Invalid password for user: {}", username);
+                }
+            }
+        }
+
         filterChain.doFilter(request, response);
     }
 }
-

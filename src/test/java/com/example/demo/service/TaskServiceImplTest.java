@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,6 +49,7 @@ public class TaskServiceImplTest {
     private TaskRequest taskRequest;
     private Task taskEntity;
     private UserEntity author;
+    private UserEntity assignee;
     private TaskResponse taskResponse;
 
     @BeforeEach
@@ -59,12 +60,16 @@ public class TaskServiceImplTest {
         userDetails = mock(UserDetails.class);
         taskRequest = new TaskRequest(Priority.HIGH, "testTask", Status.IN_REVIEW, null, 1L);
         taskEntity = new Task();
+        assignee = new UserEntity();
         author = new UserEntity();
+        author.setId(1L);
         taskResponse = new TaskResponse(Priority.HIGH, "testTask", Status.IN_REVIEW, 1L, new UserDtoResponse(1L, "user", "lexagri200430@gmail.com"), new HashSet<>(), new UserDtoResponse(1L, "user", "lexagri200430@gmail.com")); // инициализация необходимыми данными
 
         when(userDetails.getUsername()).thenReturn("testUser");
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(author));
         when(taskMapper.toResponse(any(Task.class))).thenReturn(taskResponse);
+        when(userRepository.findById(taskRequest.assigneeId())).thenReturn(Optional.of(assignee));
+        when(userRepository.findById(author.getId())).thenReturn(Optional.of(author));
     }@Test
 
     public void testGetAllTasks() {
@@ -74,11 +79,11 @@ public class TaskServiceImplTest {
         when(taskRepository.findAll(pageable)).thenReturn(new PageImpl<>(Collections.singletonList(task)));
 
         // Вызов метода
-        List<TaskResponse> responses = taskService.getAllTasks(pageable);
+        Page<TaskResponse> responses = taskService.getAllTasks(pageable);
 
         // Проверка результатов
         assertNotNull(responses);
-        assertEquals(1, responses.size());
+        assertEquals(1L, responses.get().count());
         verify(taskMapper).toResponse(task);
     }
 
@@ -99,7 +104,8 @@ public class TaskServiceImplTest {
     public void testUpdateTask() {
         // Подготовка данных
         Long taskId = 1L;
-        when(taskRepository.getReferenceById(taskId)).thenReturn(taskEntity);
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(taskEntity));
+
 
         // Вызов метода
         TaskResponse response = taskService.updateTask(userDetails, taskRequest, taskId);
@@ -119,11 +125,11 @@ public class TaskServiceImplTest {
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
 
         // Вызов метода
-        Optional<TaskResponse> response = taskService.deleteTask(userDetails, taskId);
+        TaskResponse response = taskService.deleteTask(userDetails, taskId);
 
 
         // Проверка результатов
-        assertNotNull(response.orElse(null));
+        assertNotNull(response);
         verify(taskRepository).delete(task);
     }
 
@@ -131,7 +137,7 @@ public class TaskServiceImplTest {
     public void testGetTaskById() {
         // Подготовка данных
         Long taskId = 1L;
-        when(taskRepository.getReferenceById(taskId)).thenReturn(taskEntity);
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(taskEntity));
 
         // Вызов метода
         TaskResponse response = taskService.getTaskById(userDetails, taskId);

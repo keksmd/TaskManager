@@ -4,88 +4,119 @@ import com.example.demo.model.data.UserEntity;
 import com.example.demo.repository.TaskRepository;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j; // Импортируем аннотацию для логирования
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 
 import java.util.Objects;
 
-
 @RequiredArgsConstructor
+@Slf4j // Аннотация для логирования с помощью Lombok
 public class CustomUserDetailsService implements UserDetailsManager {
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.info("Loading user by username: {}", username);
         return userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+                .orElseThrow(() -> {
+                    log.warn("User not found with username: {}", username);
+                    return new UsernameNotFoundException("User not found with username: " + username);
+                });
     }
 
     @Override
     public void createUser(UserDetails user) {
+        log.info("Creating user: {}", user.getUsername());
         UserEntity entity = (UserEntity) user;
         userRepository.save(entity);
+        log.info("User created: {}", user.getUsername());
     }
 
     @Override
     public void updateUser(UserDetails user) {
+        log.info("Updating user: {}", user.getUsername());
         UserEntity entity = (UserEntity) user;
         userRepository.save(entity);
+        log.info("User updated: {}", user.getUsername());
     }
 
     @Override
     public void deleteUser(String username) {
+        log.info("Deleting user: {}", username);
         userRepository.deleteByUsername(username);
+        log.info("User deleted: {}", username);
     }
 
     @Override
     public void changePassword(String oldPassword, String newPassword) {
-        userRepository.findAll().stream().filter(u->u.getPassword().equals(oldPassword)).forEach(u->u.setPassword(newPassword));
+        log.info("Changing password for user with old password: {}", oldPassword);
+        userRepository.findAll().stream()
+                .filter(u -> u.getPassword().equals(oldPassword))
+                .forEach(u -> {
+                    u.setPassword(newPassword);
+                    log.info("Password changed for user: {}", u.getUsername());
+                });
     }
 
     @Override
     public boolean userExists(String username) {
+        log.info("Checking existence of user: {}", username);
         try {
             UserDetails userDetails = this.loadUserByUsername(username);
-            return userDetails.isEnabled();
-        }catch (UsernameNotFoundException e){
+            boolean exists = userDetails.isEnabled();
+            log.info("User exists: {}", username);
+            return exists;
+        } catch (UsernameNotFoundException e) {
+            log.warn("User not found: {}", username);
             return false;
         }
     }
-    private UserEntity findByDetails(UserDetails userDetails){
-        if(this.userExists(userDetails.getUsername())){
+
+    private UserEntity findByDetails(UserDetails userDetails) {
+        log.info("Finding user by details for username: {}", userDetails.getUsername());
+        if (this.userExists(userDetails.getUsername())) {
             return (UserEntity) this.loadUserByUsername(userDetails.getUsername());
-        }else{
-            throw new  UsernameNotFoundException("User not found with username: " + userDetails.getUsername());
+        } else {
+
+            log.warn("User not found with username: {}", userDetails.getUsername());
+            throw new UsernameNotFoundException("User not found with username: " + userDetails.getUsername());
         }
     }
-    private final TaskRepository taskRepository;
-    public boolean isAdminOrAssignee(UserDetails userDetails, Long taskId){
+
+    public boolean isAdminOrAssignee(UserDetails userDetails, Long taskId) {
+        log.info("Checking if user is admin or assignee for task ID: {}", taskId);
         try {
             var user = this.findByDetails(userDetails);
             boolean assignee;
             try {
-                 assignee= Objects.requireNonNull(taskRepository.findById(taskId).orElse(null)).getAssignee().getId().equals(user.getId());
-            }catch (NullPointerException e){
+                assignee = Objects.requireNonNull(taskRepository.findById(taskId).orElse(null)).getAssignee().getId().equals(user.getId());
+            } catch (NullPointerException e) {
                 assignee = false;
             }
-                return (user.getRoles().stream().anyMatch(r -> r.getAuthority().equalsIgnoreCase("admin"))
-                        ||assignee);
-            }
-        catch (UsernameNotFoundException e){
-            return  false;
+            boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getAuthority().equalsIgnoreCase("admin"));
+            boolean result = isAdmin || assignee;
+            log.info("User {} is {} for task ID: {}", user.getUsername(), result ? "admin or assignee" : "not admin or assignee", taskId);
+            return result;
+        } catch (UsernameNotFoundException e) {
+            log.warn("Username not found when checking permissions for task ID: {}", taskId);
+            return false;
         }
-
     }
-    public boolean isAdmin(UserDetails userDetails){
+
+    public boolean isAdmin(UserDetails userDetails) {
+        log.info("Checking if user is admin for username: {}", userDetails.getUsername());
         try {
             var user = this.findByDetails(userDetails);
-            return (user.getRoles().stream().anyMatch(r-> r.getAuthority().equalsIgnoreCase("admin")));
-        }catch (UsernameNotFoundException e){
-            return  false;
+            boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getAuthority().equalsIgnoreCase("admin"));
+            log.info("User {} is {}", user.getUsername(), isAdmin ? "an admin" : "not an admin");
+            return isAdmin;
+        } catch (UsernameNotFoundException e) {
+            log.warn("Username not found when checking admin status: {}", userDetails.getUsername());
+            return false;
         }
-
-        }
-
+    }
 }
