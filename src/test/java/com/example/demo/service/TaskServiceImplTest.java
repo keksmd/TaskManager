@@ -58,7 +58,7 @@ public class TaskServiceImplTest {
 
         // Создание тестовых данных
         userDetails = mock(UserDetails.class);
-        taskRequest = new TaskRequest(Priority.HIGH, "testTask", Status.IN_REVIEW, null, 1L);
+        taskRequest = new TaskRequest(Priority.HIGH, "testTask", Status.IN_REVIEW,  1L);
         taskEntity = new Task();
         assignee = new UserEntity();
         author = new UserEntity();
