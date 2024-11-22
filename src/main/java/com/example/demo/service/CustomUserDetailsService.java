@@ -8,9 +8,6 @@ import com.example.demo.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -26,29 +23,20 @@ import java.util.Objects;
 public class CustomUserDetailsService implements UserDetailsManager {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
-    @Bean
-    Role adminRole(@Autowired RoleRepository roleRepository) {
-
-        return role;
-    }
-
-    @Bean
-    Role userRole(@Autowired RoleRepository roleRepository) {
-
-    }
+    private final RoleRepository roleRepository;
 
     @PostConstruct
     public void customUserDetailsService() {
-        Role фвьштrole = new Role();
-        role.setId(1L);
-        role.setName("admin");
-        roleRepository.save(role);
+        Role adminRole = new Role();
+        adminRole.setId(1L);
+        adminRole.setName("admin");
+        roleRepository.save(adminRole);
 
-        Role role = new Role();
-        role.setId(2L);
-        role.setName("user");
-        roleRepository.save(role);
-        return role;
+        Role userRole = new Role();
+        userRole.setId(2L);
+        userRole.setName("user");
+        roleRepository.save(userRole);
+
 
         var admin = new UserEntity();
         admin.setUsername("admin");
