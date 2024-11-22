@@ -62,7 +62,6 @@ public class TaskServiceImpl implements TaskService {
         taskEntity.setHeader(task.header());
         taskEntity.setPriority(task.priority());
         taskEntity.setStatus(task.status());
-
         if (task.assigneeId() != null) {
             taskEntity.setAssignee(userRepository.findById(task.assigneeId()).orElseThrow(()->new ResourceNotFoundException(String.format("User with id %d not found",task.assigneeId()))));
         }

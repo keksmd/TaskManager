@@ -3,6 +3,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.dto.TaskRequest;
 import com.example.demo.model.dto.TaskResponse;
+import com.example.demo.service.CustomUserDetailsService;
 import com.example.demo.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskControllerImpl implements TaskController {
 
     private final TaskService taskService;
+   public final CustomUserDetailsService customUserDetailsService;
 
 
     @Override

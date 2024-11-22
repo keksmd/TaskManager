@@ -1,22 +1,72 @@
 package com.example.demo.service;
 
+import com.example.demo.model.data.Role;
 import com.example.demo.model.data.UserEntity;
+import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.TaskRepository;
 import com.example.demo.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j; // Импортируем аннотацию для логирования
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
-@Slf4j // Аннотация для логирования с помощью Lombok
+@Slf4j
+@Service// Аннотация для логирования с помощью Lombok
 public class CustomUserDetailsService implements UserDetailsManager {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
+    @Bean
+    Role adminRole(@Autowired RoleRepository roleRepository) {
 
+        return role;
+    }
+
+    @Bean
+    Role userRole(@Autowired RoleRepository roleRepository) {
+
+    }
+
+    @PostConstruct
+    public void customUserDetailsService() {
+        Role фвьштrole = new Role();
+        role.setId(1L);
+        role.setName("admin");
+        roleRepository.save(role);
+
+        Role role = new Role();
+        role.setId(2L);
+        role.setName("user");
+        roleRepository.save(role);
+        return role;
+
+        var admin = new UserEntity();
+        admin.setUsername("admin");
+        admin.setPassword("admin");
+        adminRole.setUsers(new HashSet<>(List.of(admin)));
+        admin.setRoles(new HashSet<>(List.of(adminRole, userRole)));
+        roleRepository.save(adminRole);
+        this.createUser(admin);
+
+        var user = new UserEntity();
+        user.setUsername("user");
+        user.setPassword("user");
+        userRole.setUsers(new HashSet<>(List.of(user, admin)));
+        user.setRoles(new HashSet<>(List.of(userRole)));
+        roleRepository.save(userRole);
+        this.createUser(user);
+
+    }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("Loading user by username: {}", username);
